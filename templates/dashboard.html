@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f9;
+}
+
+.container {
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    background: #2c3e50;
+    color: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.sidebar h3 {
+    text-align: center;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    background: #34495e;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* CARDS */
+.cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.card {
+    flex: 1;
+    padding: 20px;
+    color: white;
+    border-radius: 10px;
+}
+
+.green { background: #27ae60; }
+.blue { background: #2980b9; }
+.orange { background: #f39c12; }
+
+/* TABLE */
+table {
+    background: white;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+</style>
+
+<div class="container">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h3>🎓 LMS 12C6</h3>
+    <a href="/dashboard">🏠 Dashboard</a>
+    <a href="/export">📥 Xuất Excel</a>
+    <a href="/logout">🚪 Đăng xuất</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<h2>📊 Dashboard</h2>
+
+{% if role == 'admin' %}
+<a href="/upload_questions" class="btn btn-success mb-3">
+    📤 Upload câu hỏi
+</a>
+<!-- CARDS -->
+<div class="cards">
+    <div class="card green">👨‍🎓 {{ total_students }} HS</div>
+    <div class="card blue">📊 TB: {{ avg_score }}</div>
+    <div class="card orange">📚 {{ lessons|length }} bài</div>
+</div>
+
+<!-- TOP 1 -->
+{% if top_students %}
+<div style="background:gold;padding:10px;margin-bottom:10px;">
+    🏆 Top 1: {{ top_students[0].username }} ({{ top_students[0].total }} điểm)
+</div>
+{% endif %}
+
+<!-- TABLE -->
+<table width="100%">
+<tr>
+<th>Học sinh</th>
+{% for lesson in lessons %}
+<th>{{ lesson.title }}</th>
+{% endfor %}
+<th>Tổng</th>
+<th>%</th>
+</tr>
+
+{% for row in report %}
+<tr>
+<td>{{ row.username }}</td>
+{% for lesson in lessons %}
+<td>{{ row.scores.get(lesson.id, '-') }}</td>
+{% endfor %}
+<td><b>{{ row.total }}</b></td>
+<td>{{ row.progress }}%</td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+<h3>📄 Bài làm học sinh</h3>
+
+<table width="100%">
+<tr>
+    <th>Học sinh</th>
+    <th>Bài</th>
+    <th>Điểm</th>
+    <th>Xem</th>
+</tr>
+
+{% for r in results_all %}
+<tr>
+    <td>{{ r.user_id }}</td>
+    <td>{{ r.lesson_id }}</td>
+    <td>{{ r.score }}</td>
+    <td>
+        <a href="{{ url_for('view_result', result_id=r.id) }}" class="btn btn-sm btn-info">
+            👁️ Xem
+        </a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+
+<!-- 👉 DÁN VÀO ĐÂY -->
+<h3>📉 Học sinh yếu</h3>
+<ul>
+{% for s in weak_students %}
+<li>{{ s.username }} ({{ s.total }})</li>
+{% endfor %}
+</ul>
+
+<h3>📈 Học sinh giỏi</h3>
+<ul>
+{% for s in good_students %}
+<li>{{ s.username }} ({{ s.total }})</li>
+{% endfor %}
+</ul>
+
+<br>
+
+<!-- BIỂU ĐỒ -->
+<canvas id="chart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const labels = JSON.parse('{{ report | map(attribute="username") | list | tojson | safe }}');
+const data = JSON.parse('{{ report | map(attribute="total") | list | tojson | safe }}');
+
+new Chart(document.getElementById('chart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Tổng điểm',
+            data: data
+        }]
+    }
+});
+</script>
+
+{% else %}
+
+<h3>📈 Tiến trình tổng: {{ percent }}%</h3>
+
+<ul class="list-group mt-3">
+{% for item in progress_list %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        
+        <a href="{{ url_for('lesson_detail', lesson_id=item.lesson.id) }}">
+            {{ item.lesson.title }}
+        </a>
+
+        {% if item.done %}
+            <span class="badge bg-success">✔️ Đã học</span>
+        {% else %}
+            <span class="badge bg-secondary">❌ Chưa học</span>
+        {% endif %}
+
+    </li>
+{% endfor %}
+</ul>
+
+<table>
+<tr><th>Bài</th><th>Điểm</th></tr>
+{% for lesson in lessons %}
+<tr>
+<td>{{ lesson.title }}</td>
+<td>{{ result_dict.get(lesson.id, 'Chưa làm') }}</td>
+</tr>
+{% endfor %}
+<tr>
+<td><b>Tổng</b></td>
+<td><b>{{ total_score }}</b></td>
+</tr>
+</table>
+
+{% endif %}
+
+</div>
+</div>
+
+{% endblock %}

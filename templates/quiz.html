@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Trắc nghiệm: {{ lesson.title }}</h2>
+
+<form method="POST">
+    {% for q in questions %}
+        <div style="margin-bottom:20px;">
+            <p><b>{{ loop.index }}. {{ q.question }}</b></p>
+
+            <input type="radio" name="{{ q.id }}" value="A"> {{ q.option_a }}<br>
+            <input type="radio" name="{{ q.id }}" value="B"> {{ q.option_b }}<br>
+            <input type="radio" name="{{ q.id }}" value="C"> {{ q.option_c }}<br>
+            <input type="radio" name="{{ q.id }}" value="D"> {{ q.option_d }}<br>
+        </div>
+    {% endfor %}
+
+    <button type="submit">Nộp bài</button>
+</form>
+
+<a href="{{ url_for('quiz_by_lesson', lesson_id=lesson.id) }}">
+    Làm trắc nghiệm
+</a>
+{% endblock %}

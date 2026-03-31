@@ -1,0 +1,21 @@
+<!DOCTYPE html>>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h2>Danh sách bài học</h2>
+
+<ul>
+{% for l in lessons %}
+    <li>
+    <a href="/lesson/{{ l.id }}">
+      {{ l.title }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
+
+<a href="/dashboard">⬅ Quay lại</a>
+    </body>
+</html>

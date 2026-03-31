@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+
+    <!-- ================= CỘT TRÁI ================= -->
+    <div class="col-md-8">
+
+        <!-- ===== BÀI HỌC ===== -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-book"></i> {{ lesson.title }}
+            </div>
+
+            <div class="card-body">
+
+                {% if lesson.content_type == "word" %}
+
+                    {% if lesson.content_doc %}
+                        <a href="{{ url_for('static', filename=lesson.content_doc) }}" 
+                           class="btn btn-primary mb-3" download>
+                           📥 Tải file Word
+                        </a>
+                    {% else %}
+                        <p>❌ Chưa có file Word</p>
+                    {% endif %}
+
+                    {% if lesson.content_pdf %}
+                        <iframe src="{{ url_for('static', filename=lesson.content_pdf) }}" 
+                                width="100%" height="600px">
+                        </iframe>
+                    {% else %}
+                        <p>❌ Chưa có file PDF</p>
+                    {% endif %}
+
+                {% elif lesson.content_type == "youtube" %}
+                    <div class="ratio ratio-16x9">
+                        <iframe src="{{ lesson.content_url }}" allowfullscreen></iframe>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- ===== TRẮC NGHIỆM ===== -->
+        <div class="card">
+            <div class="card-header bg-warning">
+                <i class="bi bi-pencil-square"></i> Trắc nghiệm
+            </div>
+
+            <div class="card-body">
+
+            {% if score is none %}
+
+                <form method="POST">
+                    {% for q in questions %}
+                        <p><b>{{ q.question }}</b></p>
+
+                        <input type="radio" name="{{ q.id }}" value="A"> {{ q.option_a }} <br>
+                        <input type="radio" name="{{ q.id }}" value="B"> {{ q.option_b }} <br>
+                        <input type="radio" name="{{ q.id }}" value="C"> {{ q.option_c }} <br>
+                        <input type="radio" name="{{ q.id }}" value="D"> {{ q.option_d }} <br><br>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-success">Nộp bài</button>
+                </form>
+
+            {% else %}
+
+                <h5>🎯 Điểm: {{ score }}/{{ questions|length }}</h5>
+                <hr>
+
+                {% for q in questions %}
+                {% set answer = user_answers.get(q.id) %}
+
+                <p><b>{{ q.question }}</b></p>
+
+                {% for key, text in {
+                    'A': q.option_a,
+                    'B': q.option_b,
+                    'C': q.option_c,
+                    'D': q.option_d
+                }.items() %}
+
+                    <div class="
+                        {% if answer == key and q.correct_answer == key %} text-success
+                        {% elif answer == key %} text-danger
+                        {% endif %}">
+                        
+                        {{ key }}. {{ text }}
+
+                        {% if answer == key and q.correct_answer == key %}
+                            ✔
+                        {% elif answer == key %}
+                            ✘
+                        {% elif q.correct_answer == key %}
+                            (Đúng)
+                        {% endif %}
+                    </div>
+
+                {% endfor %}
+                <hr>
+                {% endfor %}
+
+                <!-- ===== NÚT ĐIỀU HƯỚNG ===== -->
+                <div class="d-flex justify-content-between mt-3">
+
+                    <a href="{{ url_for('lesson_detail', lesson_id=lesson.id) }}" 
+                       class="btn btn-primary">
+                        🔁 Làm lại
+                    </a>
+
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="btn btn-secondary">
+                        🏠 Trang chủ
+                    </a>
+
+                    {% if next_lesson %}
+                        <a href="{{ url_for('lesson_detail', lesson_id=next_lesson.id) }}" 
+                           class="btn btn-success">
+                            ⏭️ Bài tiếp
+                        </a>
+                    {% else %}
+                        <span class="text-muted">✔️ Bài cuối</span>
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= CỘT PHẢI ================= -->
+    <div class="col-md-4">
+
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                📊 Lịch sử làm bài
+            </div>
+        <div class="card mt-4">
+    {% if current_user.role == 'admin' %}
+<form method="POST" action="{{ url_for('add_comment', user_id=current_user.id, lesson_id=lesson.id) }}">
+    
+    <div class="mb-2">
+        <textarea name="content" class="form-control" placeholder="Nhập nhận xét..." required></textarea>
+    </div>
+
+    <button class="btn btn-primary btn-sm">Gửi nhận xét</button>
+</form>
+<hr>
+{% endif %}
+            <div class="card-header bg-secondary text-white">
+        💬 Nhận xét của giáo viên
+    </div>
+
+    <div class="card-body">
+
+        {% for c in comments %}
+            <div class="mb-2">
+                <b>{{ c.teacher_name }}</b>: {{ c.content }} <br>
+                <small>
+                    {{ c.created_at.strftime('%d-%m-%Y %H:%M') }}
+                </small>
+            </div>
+            <hr>
+        {% else %}
+            <p>Chưa có nhận xét</p>
+        {% endfor %}
+
+    </div>
+</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Lần</th>
+                        <th>Điểm</th>
+                        <th>Thời gian</th>
+                    </tr>
+
+                    {% for r in results %}
+                    <tr>
+                        <td>{{ r.attempt }}</td>
+                        <td>{{ r.score }}</td>
+                        <td>
+                            {% if r.created_at %}
+                            {{ r.created_at.strftime('%d-%m-%Y %H:%M') }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===== NÚT HOME GÓC PHẢI ===== -->
+<a href="{{ url_for('dashboard') }}" 
+   style="position: fixed; bottom: 20px; right: 20px;"
+   class="btn btn-danger">
+   🏠 Về Trang chủ
+</a>
+
+{% endblock %}

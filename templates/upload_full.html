@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h3>📤 Upload bài học (Word + PDF + CSV)</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label>Tên bài học</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>File Word</label>
+            <input type="file" name="word_file" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>File PDF</label>
+            <input type="file" name="pdf_file" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>File CSV (trắc nghiệm)</label>
+            <input type="file" name="csv_file" class="form-control" required>
+        </div>
+
+        <button class="btn btn-success">🚀 Upload</button>
+
+    </form>
+</div>
+
+{% endblock %}

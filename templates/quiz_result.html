@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .question-box {
+        margin-bottom:20px;
+        padding:15px;
+        border:1px solid #ccc;
+        border-radius:8px;
+    }
+
+    .option {
+        padding:5px;
+        margin-bottom:5px;
+        border-radius:4px;
+    }
+
+    .correct {
+        background-color: #d4edda;
+    }
+
+    .wrong {
+        background-color: #f8d7da;
+    }
+</style>
+
+<h2>Kết quả: {{ score }}/{{ questions|length }}</h2>
+<hr>
+
+{% for q in questions %}
+{% set answer = user_answers.get(q.id) %}
+
+<div class="question-box">
+
+    <p><b>{{ loop.index }}. {{ q.question }}</b></p>
+
+    <!-- A -->
+    <div class="option
+        {% if answer == 'A' and q.correct_answer == 'A' %} correct
+        {% elif answer == 'A' and q.correct_answer != 'A' %} wrong
+        {% endif %}">
+        A. {{ q.option_a }}
+
+        {% if answer == 'A' and q.correct_answer == 'A' %}
+            ✔
+        {% elif answer == 'A' and q.correct_answer != 'A' %}
+            ✘
+        {% elif q.correct_answer == 'A' %}
+            (Đáp án đúng)
+        {% endif %}
+    </div>
+
+    <!-- B -->
+    <div class="option
+        {% if answer == 'B' and q.correct_answer == 'B' %} correct
+        {% elif answer == 'B' and q.correct_answer != 'B' %} wrong
+        {% endif %}">
+        B. {{ q.option_b }}
+
+        {% if answer == 'B' and q.correct_answer == 'B' %}
+            ✔
+        {% elif answer == 'B' and q.correct_answer != 'B' %}
+            ✘
+        {% elif q.correct_answer == 'B' %}
+            (Đáp án đúng)
+        {% endif %}
+    </div>
+
+    <!-- C -->
+    <div class="option
+        {% if answer == 'C' and q.correct_answer == 'C' %} correct
+        {% elif answer == 'C' and q.correct_answer != 'C' %} wrong
+        {% endif %}">
+        C. {{ q.option_c }}
+
+        {% if answer == 'C' and q.correct_answer == 'C' %}
+            ✔
+        {% elif answer == 'C' and q.correct_answer != 'C' %}
+            ✘
+        {% elif q.correct_answer == 'C' %}
+            (Đáp án đúng)
+        {% endif %}
+    </div>
+
+    <!-- D -->
+    <div class="option
+        {% if answer == 'D' and q.correct_answer == 'D' %} correct
+        {% elif answer == 'D' and q.correct_answer != 'D' %} wrong
+        {% endif %}">
+        D. {{ q.option_d }}
+
+        {% if answer == 'D' and q.correct_answer == 'D' %}
+            ✔
+        {% elif answer == 'D' and q.correct_answer != 'D' %}
+            ✘
+        {% elif q.correct_answer == 'D' %}
+            (Đáp án đúng)
+        {% endif %}
+    </div>
+
+</div>
+{% endfor %}
+
+<a href="{{ url_for('dashboard') }}">
+    Quay lại Dashboard
+</a>
+
+{% endblock %}

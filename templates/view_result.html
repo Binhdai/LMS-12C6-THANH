@@ -1,0 +1,22 @@
+<h3>📄 Bài làm của học sinh</h3>
+
+<p>Điểm: {{ result.score }}</p>
+
+{% for q in questions %}
+    <p><b>{{ q.question }}</b></p>
+
+    {% set answer = user_answers.get(q.id) %}
+
+    <p>
+        HS chọn: {{ answer if answer else "Không chọn" }} <br>
+        Đáp án đúng: {{ q.correct_answer }}
+    </p>
+
+    <hr>
+{% endfor %}
+
+<!-- FORM NHẬN XÉT -->
+<form method="POST" action="{{ url_for('add_comment', user_id=result.user_id, lesson_id=result.lesson_id) }}">
+    <textarea name="content" class="form-control" placeholder="Nhập nhận xét..."></textarea>
+    <button class="btn btn-primary mt-2">Gửi nhận xét</button>
+</form>
