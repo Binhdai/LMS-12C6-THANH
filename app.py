@@ -546,7 +546,13 @@ def view_result(result_id):
 # CHẠY APP
 # -------------------------
 if __name__ == '__main__':
+    import os
     with app.app_context():
         db.create_all()
         create_admin()
-    app.run(host="0.0.0.0",port=5000,debug=True)
+    #app.run(host="0.0.0.0",port=5000,debug=True)
+    #git add .
+    #git commit -m "sua app run"
+    #git push
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
