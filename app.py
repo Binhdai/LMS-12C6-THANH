@@ -16,7 +16,12 @@ import io
 # TẠO FLASK APP
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'khoa-bi-mat-cua-lop-12c6' # Để bảo mật session
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL") # Tạo file DB tên lop12c6.db
+if os.environ.get("DATABASE_URL"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # TẠO FLASK APP-
 # KẾT NỐI DATABASE
@@ -219,9 +224,9 @@ def dashboard():
 def quiz_by_lesson(lesson_id):
 
     lesson = Lesson.query.get_or_404(lesson_id)
-
-    questions = QuizQuestion.query.filter_by(lesson_id=lesson_id).all()
-    questions = random.sample(questions, min(10, len(questions)))
+    if request.method == 'GET':
+        questions = QuizQuestion.query.filter_by(lesson_id=lesson_id).all()
+        questions = random.sample(questions, min(10, len(questions)))
 
     if not questions:
         return "Bài này chưa có câu hỏi"
