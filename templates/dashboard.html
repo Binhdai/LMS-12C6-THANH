@@ -78,7 +78,7 @@ table th, table td {
 <div class="sidebar">
     <h3>🎓 LMS 12C6</h3>
     <a href="/dashboard">🏠 Dashboard</a>
-    <a href="/export">📥 Xuất Excel</a>
+    <a href="/export_excel">📥 Xuất Excel</a>
     <a href="/logout">🚪 Đăng xuất</a>
 </div>
 
@@ -90,6 +90,9 @@ table th, table td {
 {% if role == 'admin' %}
 <a href="/upload_questions" class="btn btn-success mb-3">
     📤 Upload câu hỏi
+</a>
+<a href="{{ url_for('export_excel') }}" class="btn btn-success">
+    📥 Xuất Excel
 </a>
 <!-- CARDS -->
 <div class="cards">

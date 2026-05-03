@@ -63,7 +63,7 @@ class Progress(db.Model):
 # KẾT QUẢ TRẮC NGHIỆM
 # -------------------im
 class Result(db.Model):
-    _table_="result"
+    _tablename_="result"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer,db.ForeignKey('user.id'))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
