@@ -16,7 +16,7 @@ import io
 # TẠO FLASK APP
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'khoa-bi-mat-cua-lop-12c6' # Để bảo mật session
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lop12c6.db' # Tạo file DB tên lop12c6.db
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL") # Tạo file DB tên lop12c6.db
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # TẠO FLASK APP-
 # KẾT NỐI DATABASE
