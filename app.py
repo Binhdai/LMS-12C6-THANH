@@ -442,7 +442,9 @@ def upload_questions():
         word_file = request.files.get('word_file')
         pdf_file = request.files.get('pdf_file')
         csv_file = request.files.get('csv_file')
-
+        print(word_file)
+        print(pdf_file)
+        print(csv_file)
         # ===== CHECK =====
         if not title:
             flash("❌ Chưa nhập tên bài")
@@ -609,6 +611,27 @@ def export_excel():
         download_name="bao_cao_hoc_sinh.xlsx",
         as_attachment=True
     )
+#Tạo route hiển thị danh sách bài học
+@app.route('/admin/lessons')
+@login_required
+def admin_lessons():
+    lessons = Lesson.query.all()
+    return render_template('admin_lessons.html', lessons=lessons)
+#Thêm route xóa
+@app.route('/admin/delete_lesson/<int:id>')
+@login_required
+def delete_lesson(id):
+    lesson = Lesson.query.get_or_404(id)
+
+    # Xóa dữ liệu liên quan
+    QuizQuestion.query.filter_by(lesson_id=id).delete()
+    Result.query.filter_by(lesson_id=id).delete()
+    Progress.query.filter_by(lesson_id=id).delete()
+
+    db.session.delete(lesson)
+    db.session.commit()
+
+    return redirect('/admin/lessons')
 # -------------------------
 # CHẠY APP
 # -------------------------

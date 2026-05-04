@@ -1,0 +1,22 @@
+<h2>Danh sách bài học</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Tên bài</th>
+        <th>Hành động</th>
+    </tr>
+
+    {% for lesson in lessons %}
+    <tr>
+        <td>{{ lesson.id }}</td>
+        <td>{{ lesson.title }}</td>
+        <td>
+            <a href="/admin/delete_lesson/{{ lesson.id }}" 
+               onclick="return confirm('Bạn có chắc muốn xóa?')">
+               ❌ Xóa
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
