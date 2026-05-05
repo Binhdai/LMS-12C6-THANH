@@ -23,15 +23,16 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # TẠO FLASK APP-
 # KẾT NỐI DATABASE
 db.init_app(app)
+migrate = Migrate(app, db)
 # Cấu hình đăng nhập
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-migrate = Migrate(app, db)
+
 #KẾT NỐI DATABASE VỚI FLASK (app.py)
 @login_manager.user_loader
 def load_user(user_id):
