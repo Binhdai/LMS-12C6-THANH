@@ -14,37 +14,31 @@
 
             <div class="card-body">
 
-                {% if lesson.content_type == "word" %}
+{% if lesson.content_type == "word" %}
 
-                    {% if lesson.content_doc %}
-                        <a href="{{ url_for('static', filename=lesson.content_doc) }}" 
-                           class="btn btn-primary mb-3" download>
-                           📥 Tải file Word
-                        </a>
-                    {% else %}
-                        <p>❌ Chưa có file Word</p>
-                    {% endif %}
-
-                    {% if lesson.content_pdf %}
-
-    {% if lesson.content_pdf.startswith('http') %}
-        <!-- 👉 PDF từ Google Drive -->
-        <a href="{{ lesson.content_pdf }}" target="_blank" class="btn btn-danger mb-2">
-            📄 Xem PDF
+    {% if lesson.content_doc %}
+        <a href="{{ lesson.content_doc }}" target="_blank"
+           class="btn btn-primary mb-2">
+           📥 Tải file Word
         </a>
-
     {% else %}
-        <!-- 👉 PDF upload trong static -->
-        <a href="{{ url_for('static', filename=lesson.content_pdf) }}" 
-           target="_blank" class="btn btn-danger mb-2">
-            📄 Xem PDF
-        </a>
+        <p>❌ Chưa có file Word</p>
     {% endif %}
 
-{% else %}
-    <p>❌ Chưa có file PDF</p>
-{% endif %}
+    {% if lesson.content_pdf %}
+        <a href="{{ lesson.content_pdf }}" target="_blank"
+           class="btn btn-danger mb-2">
+           📄 Xem PDF
+        </a>
 
+        <!-- Xem trực tiếp -->
+        <iframe src="{{ lesson.content_pdf }}" width="100%" height="600px"></iframe>
+
+    {% else %}
+        <p>❌ Chưa có file PDF</p>
+    {% endif %}
+
+{% endif %}
 
                 {% elif lesson.content_type == "youtube" %}
                     <div class="ratio ratio-16x9">

@@ -38,8 +38,8 @@ class Lesson(db.Model):
     content_type = db.Column(db.String(50))
     ## content_path = db.Column(db.String(500))
     content_url = db.Column(db.String(500))
-    content_pdf = db.Column(db.String(255))   
-    content_doc = db.Column(db.String(255))   
+    content_pdf = db.Column(db.Text)   
+    content_doc = db.Column(db.Text)   
 # -------------------
 # CÂU HỎI TRẮC NGHIỆM
 # -------------------
