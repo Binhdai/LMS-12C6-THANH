@@ -141,44 +141,71 @@
 
     </div>
 
-    <!-- ================= CỘT PHẢI ================= -->
-    <div class="col-md-4">
+   <!-- ================= CỘT PHẢI ================= -->
+<div class="col-md-4">
 
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                📊 Lịch sử làm bài
-            </div>
-        <div class="card mt-4">
-    {% if current_user.role == 'admin' %}
-<form method="POST" action="{{ url_for('add_comment', user_id=current_user.id, lesson_id=lesson.id) }}">
-    
-    <div class="mb-2">
-        <textarea name="content" class="form-control" placeholder="Nhập nhận xét..." required></textarea>
+    <!-- LỊCH SỬ -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            📊 Lịch sử làm bài
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Lần</th>
+                    <th>Điểm</th>
+                    <th>Thời gian</th>
+                </tr>
+
+                {% for r in results %}
+                <tr>
+                    <td>{{ r.attempt }}</td>
+                    <td>{{ r.score }}</td>
+                    <td>
+                        {% if r.created_at %}
+                        {{ r.created_at.strftime('%d-%m-%Y %H:%M') }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
     </div>
 
-    <button class="btn btn-primary btn-sm">Gửi nhận xét</button>
-</form>
-<hr>
-{% endif %}
-            <div class="card-header bg-secondary text-white">
-        💬 Nhận xét của giáo viên
-    </div>
+    <!-- NHẬN XÉT -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            💬 Nhận xét của giáo viên
+        </div>
 
-    <div class="card-body">
+        <div class="card-body">
 
-        {% for c in comments %}
-            <div class="mb-2">
-                <b>{{ c.teacher_name }}</b>: {{ c.content }} <br>
-                <small>
-                    {{ c.created_at.strftime('%d-%m-%Y %H:%M') }}
-                </small>
-            </div>
+            {% if current_user.role == 'admin' %}
+            <form method="POST" action="{{ url_for('add_comment', user_id=current_user.id, lesson_id=lesson.id) }}">
+                <div class="mb-2">
+                    <textarea name="content" class="form-control" placeholder="Nhập nhận xét..." required></textarea>
+                </div>
+                <button class="btn btn-primary btn-sm">Gửi nhận xét</button>
+            </form>
             <hr>
-        {% else %}
-            <p>Chưa có nhận xét</p>
-        {% endfor %}
+            {% endif %}
 
+            {% for c in comments %}
+                <div class="mb-2">
+                    <b>{{ c.teacher_name }}</b>: {{ c.content }} <br>
+                    <small>
+                        {{ c.created_at.strftime('%d-%m-%Y %H:%M') }}
+                    </small>
+                </div>
+                <hr>
+            {% else %}
+                <p>Chưa có nhận xét</p>
+            {% endfor %}
+
+        </div>
     </div>
+
 </div>
             <div class="card-body">
                 <table class="table table-bordered">
