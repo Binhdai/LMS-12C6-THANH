@@ -148,7 +148,7 @@ table th, table td {
     <td>{{ r.score }}</td>
     <td>
         <a href="{{ url_for('view_result', result_id=r.id) }}" class="btn btn-sm btn-info">
-            👁️ Xem
+            👁️ Xem lại
         </a>
     </td>
 </tr>
@@ -158,7 +158,7 @@ table th, table td {
 <br>
 
 <!-- 👉 DÁN VÀO ĐÂY -->
-<h3>📉 Học sinh yếu</h3>
+<h3>📉 Học sinh chưa đạt</h3>
 <ul>
 {% for s in weak_students %}
 <li>{{ s.username }} ({{ s.total }})</li>
