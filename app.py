@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, QuizQuestion, Progress, Result, Lesson
 from flask_migrate import Migrate
+from flask_migrate import upgrade
 import random
 from flask import abort
 from datetime import datetime 
@@ -692,7 +693,17 @@ def delete_lesson(id):
 # -------------------------
 
 with app.app_context():
+    try:
+        # ✅ cập nhật database
+        upgrade()
+        print("✅ Database upgraded")
+    except Exception as e:
+        print("❌ Lỗi migrate:", e)
+
+    # ✅ tạo bảng nếu chưa có
     db.create_all()
+
+    # ✅ tạo admin
     create_admin()
 if __name__ == '__main__':
     import os
