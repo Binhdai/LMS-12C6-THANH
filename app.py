@@ -716,9 +716,13 @@ def auto_fix_links():
     # 👉 map ID bài → link đúng
     mapping = {
         11: {
+            "doc": "https://docs.google.com/document/d/16JzX6aLeGkTRvl5-2SexUOY6XNRf8d3o/export?format=docx",
+            "pdf": "https://drive.google.com/file/d/1WW7CuLYlqB0G1ACCByzVbUX2GA_idIL9/preview"
+        },
+        12: {
             "doc": "LINK_DOC",
             "pdf": "LINK_PDF"
-        }
+        },
     }
 
     for lesson_id, links in mapping.items():
@@ -731,6 +735,8 @@ def auto_fix_links():
         if lesson:
             lesson.content_doc = links["doc"]
             lesson.content_pdf = links["pdf"]
+            db.session.add(lesson)
+            
             print("ĐÃ UPDATE:", lesson.id)
 
     db.session.commit()
