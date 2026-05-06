@@ -688,7 +688,78 @@ def delete_lesson(id):
     db.session.commit()
 
     return redirect('/admin/lessons')
-# -------------------------
+
+#Tạo route sửa (nếu chưa có)
+@app.route('/admin/fix_link/<int:lesson_id>', methods=['GET', 'POST'])
+def fix_link(lesson_id):
+    lesson = Lesson.query.get_or_404(lesson_id)
+
+    if request.method == 'POST':
+        lesson.content_doc = request.form.get('word_link')
+        lesson.content_pdf = request.form.get('pdf_link')
+        db.session.commit()
+        return "Đã cập nhật!"
+
+    return f"""
+    <form method="POST">
+        Word: <input name="word_link" value="{lesson.content_doc or ''}"><br>
+        PDF: <input name="pdf_link" value="{lesson.content_pdf or ''}"><br>
+        <button>Lưu</button>
+    </form>
+    """
+
+@app.route('/admin/auto_fix_links')
+@login_required
+def auto_fix_links():
+    if current_user.role != 'admin':
+        return "❌ Không có quyền"
+    # 👉 map ID bài → link đúng
+    mapping = {
+        1: {
+            "doc": "https://docs.google.com/document/d/16JzX6aLeGkTRvl5-2SexUOY6XNRf8d3o/preview",
+            "pdf": "https://drive.google.com/file/d/1WW7CuLYlqB0G1ACCByzVbUX2GA_idIL9/preview"
+        },
+        2: {
+            "doc": "https://docs.google.com/document/d/1m25EdvcqMBURHnH-MdTLgFkzXc_NLR1r/preview",
+            "pdf": "https://drive.google.com/file/d/164_icTuacIwQMllzCvSBmtU1adf9aUIJ/preview"
+        },
+        3: {
+            "doc": "https://docs.google.com/document/d/1_dBW_a5do5UO745ZfUiGm4IyOofKlSpW/preview",
+            "pdf": "https://drive.google.com/file/d/1gXI_CUXbToJ03T4UYjjw9Q9C7gPPmwCh/preview"
+        },
+        4: {
+            "doc": "https://docs.google.com/document/d/12oflzpK3RSpxiAn0ufhTWEW_uRzrNuF2/preview",
+            "pdf": "https://drive.google.com/file/d/15fQ4XOJqW6y7FrYp2MkTu3XxUaeEov92/preview"
+        },
+        5: {
+            "doc": "https://docs.google.com/document/d/1vJrUnoCMuI-n05h53sp7UNeeZ59Vnskc/preview",
+            "pdf": "https://drive.google.com/file/d/1ovMdwJUDN3vcJsBaASaqnW2Jq_VAFsmX/preview"
+        },
+        6: {
+            "doc": "https://docs.google.com/document/d/12RXwEYcMAfVTWdCvtQF0aTtdIr5BYQvp/preview",
+            "pdf": "https://drive.google.com/file/d/1Ad39ru42_d-aCDhunZWrOUn7FIsNB2Ty/preview"
+        },
+        7: {
+            "doc": "https://docs.google.com/document/d/1bkYHNhvMkYNmzs06_pzGYmR8-xY_XrN/preview",
+            "pdf": "https://drive.google.com/file/d/1AekKiVgl2cDVhWtHjqRaYgQmwfLS8Dz5/preview"
+        },
+        8: {
+            "doc": "https://docs.google.com/document/d/1t-ymCLQkWgmskNH20ft29qF98gVNvI5j/preview",
+            "pdf": "https://drive.google.com/file/d/1ZZZe9g692lwuTdhWTOgSm7f6r4gd9zjY/preview"
+        }
+
+    }
+
+    for lesson_id, links in mapping.items():
+        lesson = Lesson.query.get(lesson_id)
+        if lesson:
+            lesson.content_doc = links["doc"]
+            lesson.content_pdf = links["pdf"]
+
+    db.session.commit()
+
+    return "✅ Đã cập nhật đúng từng bài!"
+# -------------------------https
 # CHẠY APP
 # -------------------------
 
