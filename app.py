@@ -737,7 +737,7 @@ def auto_fix_links():
         },
         6: {
             "doc": "https://docs.google.com/document/d/12RXwEYcMAfVTWdCvtQF0aTtdIr5BYQvp/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/1Ad39ru42_d-aCDhunZWrOUn7FIsNB2Ty/preview"
+            "pdf": "hhttps://drive.google.com/file/d/1Ad39ru42_d-aCDhunZWrOUn7FIsNB2Ty/preview"
         },
         7: {
             "doc": "https://docs.google.com/document/d/1bkYHNhvMkYNmzs06_pzGYmR8-xY_XrN_/export?format=docx",
