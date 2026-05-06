@@ -715,43 +715,19 @@ def auto_fix_links():
         return "❌ Không có quyền"
     # 👉 map ID bài → link đúng
     mapping = {
-        11: {
-            "doc": "https://docs.google.com/document/d/16JzX6aLeGkTRvl5-2SexUOY6XNRf8d3o/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/1WW7CuLYlqB0G1ACCByzVbUX2GA_idIL9/preview"
-        },
-        12: {
-            "doc": "https://docs.google.com/document/d/1m25EdvcqMBURHnH-MdTLgFkzXc_NLR1r/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/164_icTuacIwQMllzCvSBmtU1adf9aUIJ/preview"
-        },
-        13: {
-            "doc": "https://docs.google.com/document/d/1_dBW_a5do5UO745ZfUiGm4IyOofKlSpW/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/1gXI_CUXbToJ03T4UYjjw9Q9C7gPPmwCh/preview"
-        },
-        14: {
-            "doc": "https://docs.google.com/document/d/12oflzpK3RSpxiAn0ufhTWEW_uRzrNuF2/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/15fQ4XOJqW6y7FrYp2MkTu3XxUaeEov92/preview"
-        },
-        15: {
-            "doc": "https://docs.google.com/document/d/1vJrUnoCMuI-n05h53sp7UNeeZ59Vnskc/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/1ovMdwJUDN3vcJsBaASaqnW2Jq_VAFsmX/preview"
-        },
-        16: {
-            "doc": "https://docs.google.com/document/d/12RXwEYcMAfVTWdCvtQF0aTtdIr5BYQvp/export?format=docx",
-            "pdf": "hhttps://drive.google.com/file/d/1Ad39ru42_d-aCDhunZWrOUn7FIsNB2Ty/preview"
-        },
-        17: {
-            "doc": "https://docs.google.com/document/d/1bkYHNhvMkYNmzs06_pzGYmR8-xY_XrN_/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/1AekKiVgl2cDVhWtHjqRaYgQmwfLS8Dz5/preview"
-        },
-        18: {
-            "doc": "https://docs.google.com/document/d/1t-ymCLQkWgmskNH20ft29qF98gVNvI5j/export?format=docx",
-            "pdf": "https://drive.google.com/file/d/1ZZZe9g692lwuTdhWTOgSm7f6r4gd9zjY/preview"
+        1: {
+            "doc": "LINK_DOC",
+            "pdf": "LINK_PDF"
         }
-
     }
 
     for lesson_id, links in mapping.items():
+
         lesson = Lesson.query.get(lesson_id)
+
+        print("ID:", lesson_id)
+        print("LESSON:", lesson)
+
         if lesson:
             lesson.content_doc = links["doc"]
             lesson.content_pdf = links["pdf"]
