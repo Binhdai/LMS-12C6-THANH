@@ -731,6 +731,7 @@ def auto_fix_links():
         if lesson:
             lesson.content_doc = links["doc"]
             lesson.content_pdf = links["pdf"]
+            print("ĐÃ UPDATE:", lesson.id)
 
     db.session.commit()
 
