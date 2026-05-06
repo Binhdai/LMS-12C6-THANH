@@ -715,7 +715,7 @@ def auto_fix_links():
         return "❌ Không có quyền"
     # 👉 map ID bài → link đúng
     mapping = {
-        1: {
+        11: {
             "doc": "LINK_DOC",
             "pdf": "LINK_PDF"
         }
