@@ -607,7 +607,8 @@ def export_excel():
     return send_file(
         output,
         download_name="bao_cao_hoc_sinh.xlsx",
-        as_attachment=True
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 #Tạo route hiển thị danh sách bài học
 @app.route('/admin/lessons')
