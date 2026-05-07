@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, QuizQuestion, Progress, Result, Lesson
+from models import db, User, QuizQuestion, Progress, Result, Lesson, Score
 from flask_migrate import Migrate
 from flask_migrate import upgrade
 import random
@@ -461,72 +461,6 @@ def upload_questions():
         if not csv_file or csv_file.filename == '':
             flash("❌ Chưa chọn file CSV")
             return render_template('upload_questions.html')
-        #title = request.form.get('title')
-        #word_file = request.files.get('word_file')
-        #pdf_file = request.files.get('pdf_file')
-        #pdf_link = request.form.get('pdf_link')
-       # csv_file = request.files.get('csv_file')
-        #print(word_file)
-        #print(pdf_file)
-        #print(pdf_link)
-        #print(csv_file)
-        # ===== CHECK =====
-        #if not title:
-         #   flash("❌ Chưa nhập tên bài")
-        #    return render_template('upload_questions.html')
-
-        #if not word_file or word_file.filename == '':
-        #    flash("❌ Chưa chọn file Word")
-        #    return render_template('upload_questions.html')
-
-        #if not pdf_file or pdf_file.filename == '':
-        #if not pdf_link == '':
-            #flash("❌ Chưa nhập link chọn file PDF")
-            #return render_template('upload_questions.html')
-
-       # if not csv_file or csv_file.filename == '':
-       #     flash("❌ Chưa chọn file CSV")
-        #    return render_template('upload_questions.html')
-
-        # ===== LƯU FILE =====
-       # os.makedirs('static/docs', exist_ok=True)
-        #os.makedirs('static/pdfs', exist_ok=True)
-       # import time
-        #word_name = str(int(time.time())) + "_" + secure_filename(word_file.filename)
-        #pdf_name = str(int(time.time())) + "_" + secure_filename(pdf_link.filename)
-
-        #word_file.save(os.path.join('static/docs', word_name))
-        #pdf_file.save(os.path.join('static/pdfs', pdf_name))
-        #pdf_link.save(os.path.join('static/pdfs', pdf_name))
-        # ===== XỬ LÝ PDF =====
-        #pdf_path = None
-
-        # 👉 TRƯỜNG HỢP 1: Upload file
-        #if pdf_file and pdf_file.filename != "":
-#os.makedirs('static/pdfs', exist_ok=True)
-
-         #   pdf_name = str(int(time.time())) + "_" + secure_filename(pdf_file.filename)
-          #  pdf_file.save(os.path.join('static/pdfs', pdf_name))
-
-          #  pdf_path = f"pdfs/{pdf_name}"
-
-        # 👉 TRƯỜNG HỢP 2: Dùng link
-        #elif pdf_link:
-            pdf_path = pdf_link
-
-        #else:
-        #    flash("❌ Chưa chọn hoặc nhập PDF")
-        #    return render_template('upload_questions.html')
-        
-        
-        # ===== TẠO LESSON =====
-       # lesson = Lesson(
-        #    title=title,
-        #    content_type="word",
-        #    content_doc=f"docs/{word_name}",
-        #    #content_pdf=f"pdfs/{pdf_name}"
-         #   content_pdf=pdf_path
-        #)
         lesson = Lesson(
             title=title,
             content_type="word",
@@ -626,12 +560,20 @@ def export_excel():
     for user in users:
         results = Result.query.filter_by(user_id=user.id).all()
 
+
         result_dict = {}
         for r in results:
-            if r.lesson_id not in result_dict:
-                result_dict[r.lesson_id] = r.score
-            else:
-                result_dict[r.lesson_id] = max(result_dict[r.lesson_id], r.score)
+            lesson = Lesson.query.get(r.lesson_id)
+
+            if lesson:
+
+                if lesson.title not in result_dict:
+                    result_dict[r.subject] = r.score
+                else:
+                    result_dict[lesson.title] = max(
+                        result_dict[lesson.title],
+                        r.score
+                    )
 
         total = sum(result_dict.values()) if result_dict else 0
 
@@ -650,8 +592,8 @@ def export_excel():
 
         # thêm điểm từng bài
         for lesson in lessons:
-            row[f"Bài {lesson.id}"] = result_dict.get(lesson.id, 0)
-
+            #row[f"Bài {lesson.id}"] = result_dict.get(lesson.id, 0)
+            row[lesson.title] = result_dict.get(lesson.title, 0)
         data.append(row)
 
     # tạo DataFrame
