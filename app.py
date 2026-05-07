@@ -547,36 +547,60 @@ def view_result(result_id):
 
 # xuất file excel
 @app.route('/export_excel')
+@login_required
 def export_excel():
 
-    try:
+    if current_user.role != 'admin':
+        abort(403)
 
-        data = [
-            {"Tên": "Học sinh 1", "Điểm": 9},
-            {"Tên": "Học sinh 2", "Điểm": 8}
-        ]
+    users = User.query.filter_by(role='student').all()
 
-        df = pd.DataFrame(data)
+    data = []
 
-        output = io.BytesIO()
+    for user in users:
 
-        df.to_excel(
-            output,
-            index=False,
-            engine='openpyxl'
-        )
+        # lấy tất cả điểm của học sinh
+        scores = Score.query.filter_by(user_id=user.id).all()
 
-        output.seek(0)
+        row = {
+            "Tên học sinh": user.username,
+            "Số lần làm bài": len(scores)
+        }
 
-        return send_file(
-            output,
-            download_name="test.xlsx",
-            as_attachment=True,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+        total = 0
 
-    except Exception as e:
-        return str(e)
+        # lưu điểm từng bài
+        for s in scores:
+
+            row[s.subject] = s.score
+
+            total += s.score
+
+        row["Tổng điểm"] = total
+
+        data.append(row)
+
+    # tạo dataframe
+    df = pd.DataFrame(data)
+
+    # tạo file excel trong RAM
+    output = io.BytesIO()
+
+    df.to_excel(
+        output,
+        index=False,
+        engine='openpyxl'
+    )
+
+    output.seek(0)
+
+    return send_file(
+        output,
+        download_name="bao_cao_hoc_sinh.xlsx",
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
 
 #Tạo route hiển thị danh sách bài học
 @app.route('/admin/lessons')
