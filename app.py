@@ -386,9 +386,6 @@ def lesson_detail(lesson_id):
               all_lessons=all_lessons,
               comments=comments 
     )
-
-
-
 #Form upload bài (route)
 @app.route('/teacher/add_lesson', methods=['GET','POST'])
 @login_required
@@ -491,8 +488,6 @@ def upload_questions():
 
         except Exception as e:
             flash(f"Lỗi CSV: {e}")
-            #print("LỖI CHI TIẾT:", e)
-            #flash(f"Lỗi: {e}")
             return render_template('upload_questions.html')
 
         flash("✅ Upload thành công!")
@@ -554,7 +549,6 @@ def export_excel():
     if current_user.role != 'admin':
         abort(403)
 
-    # ===== LẤY DỮ LIỆU =====
     users = User.query.filter_by(role='student').all()
     lessons = Lesson.query.all()
 
@@ -569,7 +563,7 @@ def export_excel():
 
         tong_diem = 0
 
-        # ===== TÍNH TIẾN ĐỘ =====
+        # ===== TIẾN ĐỘ =====
         completed = Progress.query.filter_by(
             user_id=user.id,
             completed=True
@@ -581,31 +575,27 @@ def export_excel():
 
         row["Tiến độ (%)"] = percent
 
-        # ===== DUYỆT TỪNG BÀI =====
+        # ===== ĐIỂM TỪNG BÀI =====
         for lesson in lessons:
 
-            # lấy tất cả điểm của bài
-            scores = Score.query.filter_by(
+            results = Result.query.filter_by(
                 user_id=user.id,
-                subject=lesson.title
+                lesson_id=lesson.id
             ).all()
 
-            # nếu có điểm
-            if scores:
+            if results:
 
                 # lấy điểm cao nhất
-                diem = max(s.score for s in scores)
+                best_score = max(r.score for r in results)
 
             else:
 
-                diem = 0
+                best_score = 0
 
-            # thêm cột bài học
-            row[lesson.title] = diem
+            row[lesson.title] = best_score
 
-            tong_diem += diem
+            tong_diem += best_score
 
-        # ===== TỔNG ĐIỂM =====
         row["Tổng điểm"] = tong_diem
 
         data.append(row)
@@ -731,6 +721,28 @@ def auto_fix_links():
     db.session.commit()
 
     return "✅ Đã cập nhật đúng từng bài!"
+
+# Fix dữ liệu cũ không mất điểm
+@app.route('/admin/fix_score_lesson')
+@login_required
+def fix_score_lesson():
+
+    if current_user.role != 'admin':
+        return "Không có quyền"
+
+    lessons = Lesson.query.all()
+
+    for score in Score.query.all():
+
+        for lesson in lessons:
+
+            if score.subject == lesson.title:
+
+                score.lesson_id = lesson.id
+
+    db.session.commit()
+
+    return "✅ Đã cập nhật lesson_id cho điểm cũ"
 # -------------------------https
 # CHẠY APP
 # -------------------------
