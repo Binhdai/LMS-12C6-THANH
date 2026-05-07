@@ -560,7 +560,7 @@ def export_excel():
 
     data = []
 
-    # ===== DUYỆT TỪNG HỌC SINH =====
+    # ===== DUYỆT HỌC SINH =====
     for user in users:
 
         row = {
@@ -569,41 +569,48 @@ def export_excel():
 
         tong_diem = 0
 
+        # ===== TÍNH TIẾN ĐỘ =====
+        completed = Progress.query.filter_by(
+            user_id=user.id,
+            completed=True
+        ).count()
+
+        percent = int(
+            (completed / len(lessons)) * 100
+        ) if lessons else 0
+
+        row["Tiến độ (%)"] = percent
+
         # ===== DUYỆT TỪNG BÀI =====
         for lesson in lessons:
 
-            # lấy điểm theo tên bài
+            # lấy tất cả điểm của bài
             scores = Score.query.filter_by(
                 user_id=user.id,
                 subject=lesson.title
             ).all()
 
-            # ===== NẾU ĐÃ LÀM BÀI =====
+            # nếu có điểm
             if scores:
 
-                # điểm cao nhất
-                diem_cao_nhat = max(s.score for s in scores)
-
-                # số lần làm
-                so_lan_lam = len(scores)
+                # lấy điểm cao nhất
+                diem = max(s.score for s in scores)
 
             else:
 
-                diem_cao_nhat = 0
-                so_lan_lam = 0
+                diem = 0
 
-            # thêm vào excel
-            row[f"{lesson.title}"] = diem_cao_nhat
-            row[f"{lesson.title} - Lần làm"] = so_lan_lam
+            # thêm cột bài học
+            row[lesson.title] = diem
 
-            tong_diem += diem_cao_nhat
+            tong_diem += diem
 
         # ===== TỔNG ĐIỂM =====
         row["Tổng điểm"] = tong_diem
 
         data.append(row)
 
-    # ===== TẠO DATAFRAME =====
+    # ===== DATAFRAME =====
     df = pd.DataFrame(data)
 
     # ===== XUẤT EXCEL =====
@@ -617,7 +624,6 @@ def export_excel():
 
     output.seek(0)
 
-    # ===== GỬI FILE =====
     return send_file(
         output,
         download_name="bao_cao_hoc_sinh.xlsx",
