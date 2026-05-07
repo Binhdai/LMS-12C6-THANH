@@ -547,69 +547,37 @@ def view_result(result_id):
 
 # xuất file excel
 @app.route('/export_excel')
-@login_required
 def export_excel():
-    if current_user.role != 'admin':
-        abort(403)
 
-    users = User.query.filter_by(role='student').all()
-    lessons = Lesson.query.all()
+    try:
 
-    data = []
+        data = [
+            {"Tên": "Học sinh 1", "Điểm": 9},
+            {"Tên": "Học sinh 2", "Điểm": 8}
+        ]
 
-    for user in users:
-        results = Result.query.filter_by(user_id=user.id).all()
+        df = pd.DataFrame(data)
 
+        output = io.BytesIO()
 
-        result_dict = {}
-        for r in results:
-            lesson = Lesson.query.get(r.lesson_id)
+        df.to_excel(
+            output,
+            index=False,
+            engine='openpyxl'
+        )
 
-            if lesson:
+        output.seek(0)
 
-                if lesson.title not in result_dict:
-                    result_dict[r.subject] = r.score
-                else:
-                    result_dict[lesson.title] = max(
-                        result_dict[lesson.title],
-                        r.score
-                    )
+        return send_file(
+            output,
+            download_name="test.xlsx",
+            as_attachment=True,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
 
-        total = sum(result_dict.values()) if result_dict else 0
+    except Exception as e:
+        return str(e)
 
-        completed = Progress.query.filter_by(
-            user_id=user.id,
-            completed=True
-        ).count()
-
-        percent = int((completed / len(lessons)) * 100) if lessons else 0
-
-        row = {
-            "Tên học sinh": user.username,
-            "Tổng điểm": total,
-            "Tiến độ (%)": percent
-        }
-
-        # thêm điểm từng bài
-        for lesson in lessons:
-            #row[f"Bài {lesson.id}"] = result_dict.get(lesson.id, 0)
-            row[lesson.title] = result_dict.get(lesson.title, 0)
-        data.append(row)
-
-    # tạo DataFrame
-    df = pd.DataFrame(data)
-
-    # ghi ra file Excel trong bộ nhớ
-    output = io.BytesIO()
-    df.to_excel(output, index=False, engine='openpyxl')
-    output.seek(0)
-
-    return send_file(
-        output,
-        download_name="bao_cao_hoc_sinh.xlsx",
-        as_attachment=True,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
 #Tạo route hiển thị danh sách bài học
 @app.route('/admin/lessons')
 @login_required
