@@ -550,40 +550,63 @@ def view_result(result_id):
 @login_required
 def export_excel():
 
+    # ===== CHỈ ADMIN =====
     if current_user.role != 'admin':
         abort(403)
 
+    # ===== LẤY DỮ LIỆU =====
     users = User.query.filter_by(role='student').all()
+    lessons = Lesson.query.all()
 
     data = []
 
+    # ===== DUYỆT TỪNG HỌC SINH =====
     for user in users:
 
-        # lấy tất cả điểm của học sinh
-        scores = Score.query.filter_by(user_id=user.id).all()
-
         row = {
-            "Tên học sinh": user.username,
-            "Số lần làm bài": len(scores)
+            "Tên học sinh": user.username
         }
 
-        total = 0
+        tong_diem = 0
 
-        # lưu điểm từng bài
-        for s in scores:
+        # ===== DUYỆT TỪNG BÀI =====
+        for lesson in lessons:
 
-            row[s.subject] = s.score
+            # lấy điểm theo tên bài
+            scores = Score.query.filter_by(
+                user_id=user.id,
+                subject=lesson.title
+            ).all()
 
-            total += s.score
+            # ===== NẾU ĐÃ LÀM BÀI =====
+            if scores:
 
-        row["Tổng điểm"] = total
+                # điểm cao nhất
+                diem_cao_nhat = max(s.score for s in scores)
+
+                # số lần làm
+                so_lan_lam = len(scores)
+
+            else:
+
+                diem_cao_nhat = 0
+                so_lan_lam = 0
+
+            # thêm vào excel
+            row[f"{lesson.title}"] = diem_cao_nhat
+            row[f"{lesson.title} - Lần làm"] = so_lan_lam
+
+            tong_diem += diem_cao_nhat
+
+        # ===== TỔNG ĐIỂM =====
+        row["Tổng điểm"] = tong_diem
 
         data.append(row)
 
-    # tạo dataframe
+    # ===== TẠO DATAFRAME =====
     df = pd.DataFrame(data)
 
-    # tạo file excel trong RAM
+    # ===== XUẤT EXCEL =====
     output = io.BytesIO()
 
     df.to_excel(
@@ -594,13 +617,13 @@ def export_excel():
 
     output.seek(0)
 
+    # ===== GỬI FILE =====
     return send_file(
         output,
         download_name="bao_cao_hoc_sinh.xlsx",
         as_attachment=True,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
 
 #Tạo route hiển thị danh sách bài học
 @app.route('/admin/lessons')
